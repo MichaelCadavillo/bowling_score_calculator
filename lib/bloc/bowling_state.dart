@@ -1,12 +1,10 @@
 part of 'bowling_cubit.dart';
 
 abstract class BowlingState extends Equatable {
-  const BowlingState({this.score = 0});
-
-  final int score;
+  const BowlingState();
 
   @override
-  List<Object?> get props => [score];
+  List<Object?> get props => [];
 }
 
 class InitialBowlingState extends BowlingState {}
@@ -15,13 +13,18 @@ class InitialBowlingState extends BowlingState {}
 class CalculatingScoreState extends BowlingState {}
 
 class ScoreCalculatedState extends BowlingState {
-  final int calculatedScore;
+  final int totalScore;
+  const ScoreCalculatedState({this.totalScore = 0});
 
-  const ScoreCalculatedState({required this.calculatedScore});
+  @override
+  List<Object?> get props => [totalScore];
 }
 
 class ErrorCalculatingScoreState extends BowlingState {
   final String errorMessage;
 
   const ErrorCalculatingScoreState({required this.errorMessage});
+
+  @override
+  List<Object?> get props => [errorMessage];
 }

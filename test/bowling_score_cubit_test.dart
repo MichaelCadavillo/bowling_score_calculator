@@ -9,7 +9,7 @@ void main() {
 
     blocTest("Test invalid roll (Negative roll value)",
         build: () => BowlingCubit(),
-        act: (bloc) => (bloc as BowlingCubit).calculateScore(-1),
+        act: (bloc) => (bloc as BowlingCubit).rollBall(-1),
         expect: () => [
               CalculatingScoreState(),
               const ErrorCalculatingScoreState(
@@ -19,7 +19,7 @@ void main() {
 
     blocTest("Test invalid roll (Big roll value)",
         build: () => BowlingCubit(),
-        act: (bloc) => (bloc as BowlingCubit).calculateScore(25),
+        act: (bloc) => (bloc as BowlingCubit).rollBall(25),
         expect: () => [
               CalculatingScoreState(),
               const ErrorCalculatingScoreState(
@@ -31,17 +31,51 @@ void main() {
         build: () => BowlingCubit(),
         act: (bloc) {
           if (bloc is BowlingCubit) {
-            bloc.calculateScore(10);
-            bloc.calculateScore(10);
+            bloc.rollBall(10);
+            bloc.rollBall(10);
+            bloc.rollBall(10);
           }
         },
         expect: () => [
               CalculatingScoreState(),
-              const ErrorCalculatingScoreState(
-                  errorMessage:
-                      "InvalidRollException: Roll value can't be more than 10!")
+              const ScoreCalculatedState(),
+              CalculatingScoreState(),
+              const ScoreCalculatedState(),
+              CalculatingScoreState(),
+              const ScoreCalculatedState(totalScore: 30)
+            ]);
+
+    blocTest("Test Spare calculation",
+        build: () => BowlingCubit(),
+        act: (bloc) {
+          if (bloc is BowlingCubit) {
+            bloc.rollBall(5);
+            bloc.rollBall(5);
+            bloc.rollBall(3);
+          }
+        },
+        expect: () => [
+              CalculatingScoreState(),
+              const ScoreCalculatedState(),
+              CalculatingScoreState(),
+              const ScoreCalculatedState(),
+              CalculatingScoreState(),
+              const ScoreCalculatedState(totalScore: 13)
+            ]);
+
+    blocTest("Test Standard frame calculation",
+        build: () => BowlingCubit(),
+        act: (bloc) {
+          if (bloc is BowlingCubit) {
+            bloc.rollBall(5);
+            bloc.rollBall(3);
+          }
+        },
+        expect: () => [
+              CalculatingScoreState(),
+              const ScoreCalculatedState(totalScore: 0),
+              CalculatingScoreState(),
+              const ScoreCalculatedState(totalScore: 8),
             ]);
   });
-
-  
 }
