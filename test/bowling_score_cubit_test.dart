@@ -7,7 +7,7 @@ void main() {
     blocTest("emits nothing when BowlingCubit is initialized",
         build: () => BowlingCubit(), expect: () => []);
 
-    blocTest("Test invalid roll (Negative roll value)",
+    blocTest("Test invalid roll (Negative roll score value)",
         build: () => BowlingCubit(),
         act: (bloc) => (bloc as BowlingCubit).rollBall(-1),
         expect: () => [
@@ -17,14 +17,14 @@ void main() {
                       "InvalidRollException: Roll can't have negative value!")
             ]);
 
-    blocTest("Test invalid roll (Big roll value)",
+    blocTest("Test invalid roll (Big roll score value)",
         build: () => BowlingCubit(),
         act: (bloc) => (bloc as BowlingCubit).rollBall(25),
         expect: () => [
               CalculatingScoreState(),
               const ErrorCalculatingScoreState(
                   errorMessage:
-                      "InvalidRollException: Roll value can't be more than 10!")
+                      "InvalidRollException: Score can't be more than 10 per Roll!")
             ]);
 
     blocTest("Test Strike calculation (Turkey scenario)",
@@ -76,6 +76,98 @@ void main() {
               const ScoreCalculatedState(totalScore: 0),
               CalculatingScoreState(),
               const ScoreCalculatedState(totalScore: 8),
+            ]);
+
+    blocTest("Test All Strike Game (Max possible score)",
+        build: () => BowlingCubit(),
+        act: (bloc) {
+          if (bloc is BowlingCubit) {
+            // Frame 1
+            bloc.rollBall(10);
+
+            // Frame 2
+            bloc.rollBall(10);
+
+            // Frame 3
+            bloc.rollBall(10);
+
+            // Frame 4
+            bloc.rollBall(10);
+
+            // Frame 5
+            bloc.rollBall(10);
+
+            // Frame 6
+            bloc.rollBall(10);
+
+            // Frame 7
+            bloc.rollBall(10);
+
+            // Frame 8
+            bloc.rollBall(10);
+
+            // Frame 9
+            bloc.rollBall(10);
+
+            // Frame 10
+            bloc.rollBall(10);
+            bloc.rollBall(10);
+            bloc.rollBall(10);
+          }
+        },
+        expect: () => [
+              CalculatingScoreState(),
+              const ScoreCalculatedState(totalScore: 0),
+              CalculatingScoreState(),
+              const ScoreCalculatedState(totalScore: 0),
+              CalculatingScoreState(),
+              const ScoreCalculatedState(totalScore: 30),
+              CalculatingScoreState(),
+              const ScoreCalculatedState(totalScore: 60),
+              CalculatingScoreState(),
+              const ScoreCalculatedState(totalScore: 90),
+              CalculatingScoreState(),
+              const ScoreCalculatedState(totalScore: 120),
+              CalculatingScoreState(),
+              const ScoreCalculatedState(totalScore: 150),
+              CalculatingScoreState(),
+              const ScoreCalculatedState(totalScore: 180),
+              CalculatingScoreState(),
+              const ScoreCalculatedState(totalScore: 210),
+              CalculatingScoreState(),
+              const ScoreCalculatedState(totalScore: 240),
+              CalculatingScoreState(),
+              const ScoreCalculatedState(totalScore: 270),
+              CalculatingScoreState(),
+              const ScoreCalculatedState(totalScore: 300),
+            ]);
+
+    blocTest("Test Reset Game",
+        build: () => BowlingCubit(),
+        act: (bloc) {
+          if (bloc is BowlingCubit) {
+            bloc.rollBall(5);
+            bloc.rollBall(2);
+            bloc.rollBall(3);
+            bloc.rollBall(3);
+            bloc.rollBall(10);
+
+            bloc.resetGame();
+          }
+        },
+        expect: () => [
+              CalculatingScoreState(),
+              const ScoreCalculatedState(),
+              CalculatingScoreState(),
+              const ScoreCalculatedState(totalScore: 7),
+              CalculatingScoreState(),
+              const ScoreCalculatedState(totalScore: 7),
+              CalculatingScoreState(),
+              const ScoreCalculatedState(totalScore: 13),
+              CalculatingScoreState(),
+              const ScoreCalculatedState(totalScore: 13),
+              ResettingScoreState(),
+              SuccessResetScoreState(),
             ]);
   });
 }
