@@ -1,5 +1,6 @@
 import 'package:bowling_score_calculator/data/exceptions/frame_out_of_range_exception.dart';
 import 'package:bowling_score_calculator/data/exceptions/invalid_roll_exception.dart';
+import 'package:bowling_score_calculator/utility/bowling_utils.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,8 +16,9 @@ class BowlingCubit extends Cubit<BowlingState> {
     emit(CalculatingScoreState());
     try {
       // Check if the game is valid before trying to calculate. Throws an exception if game is invalid.
-      if (isGameValid(rollScore, rolls)) {
+      if (BowlingUtils.isGameValid(rolls, rollScore)) {
         rolls.add(rollScore);
+        // emit(UpdatedRollsState(rolls: rolls));
 
         int totalScore = _calculateScore();
 
@@ -47,14 +49,14 @@ class BowlingCubit extends Cubit<BowlingState> {
     int rollIndex = 0;
 
     for (int frame = 0; frame < 10; frame++) {
-      if (_isStrike(rollIndex)) {
+      if (BowlingUtils.isStrike(rolls, rollIndex)) {
         // Checks if the next two rolls already exists to calculate score.
         if (rolls.length > rollIndex + 1 && rolls.length > rollIndex + 2) {
           score +=
               rolls[rollIndex] + rolls[rollIndex + 1] + rolls[rollIndex + 2];
           rollIndex++;
         }
-      } else if (_isSpare(rollIndex)) {
+      } else if (BowlingUtils.isSpare(rolls, rollIndex)) {
         if (rolls.length > rollIndex + 1 && rolls.length > rollIndex + 2) {
           score +=
               rolls[rollIndex] + rolls[rollIndex + 1] + rolls[rollIndex + 2];
@@ -69,34 +71,5 @@ class BowlingCubit extends Cubit<BowlingState> {
     }
 
     return score;
-  }
-
-  bool _isSpare(rollIndex) {
-    // if rolls does not have enough length to check if spare, return false
-    if (rolls.length <= rollIndex + 1) return false;
-
-    // If second roll from [rollIndex] is equal to 10, then it must be a spare.
-    return (rolls[rollIndex] + rolls[rollIndex + 1]) == 10;
-  }
-
-  bool _isStrike(rollIndex) {
-    // if rolls does not have enough length to check if strike, return false
-    if (rolls.length <= rollIndex) return false;
-
-    // If the roll is equal to 10, then it must be a strike.
-    return rolls[rollIndex] == 10;
-  }
-
-  bool isGameValid(int rollScore, List<int> rolls) {
-    // Check if score from roll is valid.
-    if (rollScore < 0) {
-      throw InvalidRollException(
-          displayMessage: "Roll can't have negative value!");
-    } else if (rollScore > 10) {
-      throw InvalidRollException(
-          displayMessage: "Score can't be more than 10 per Roll!");
-    }
-
-    return true;
   }
 }
