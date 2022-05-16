@@ -1,6 +1,7 @@
 import 'package:bowling_score_calculator/data/exceptions/frame_out_of_range_exception.dart';
 import 'package:bowling_score_calculator/data/exceptions/invalid_roll_exception.dart';
 import 'package:bowling_score_calculator/utility/bowling_utils.dart';
+import 'package:bowling_score_calculator/utility/list_util.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,6 +20,8 @@ class BowlingCubit extends Cubit<BowlingState> {
       // Check if the game is valid before trying to calculate. Throws an exception if game is invalid.
       if (BowlingUtils.isGameValid(rolls, rollScore)) {
         rolls.add(rollScore);
+
+        // Update roll scores for UI
         rollsForUI.clear();
         rollsForUI.addAll(_getRollsForUI(rolls));
 
@@ -46,6 +49,24 @@ class BowlingCubit extends Cubit<BowlingState> {
     rolls.clear();
     rollsForUI.clear();
     emit(SuccessResetScoreState());
+  }
+
+  /// Used fetching the applicable roll buttons for the current frame
+  Future<void> fetchApplicableButtons() async {
+    emit(UpdatingApplicableRollsState());
+    List<int> applicableRollValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    if (ListUtil.isNotEmpty(rollsForUI) &&
+        rollsForUI.lastIndexWhere((element) => rollsForUI.length % 2 == 1) !=
+            -1) {
+      int highestPossibleRoll = 10 - rollsForUI.last;
+      print("highestPossibleRoll: $highestPossibleRoll");
+      applicableRollValues.removeRange(
+          highestPossibleRoll + 1, applicableRollValues.length);
+    }
+
+    print("Applicable Roll Values: $applicableRollValues");
+
+    emit(UpdatedApplicableRollsState(rollValues: applicableRollValues));
   }
 
   /// Main logic for calculating the score of the game

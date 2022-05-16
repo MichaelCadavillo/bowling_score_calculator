@@ -16,6 +16,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   void didChangeDependencies() {
     // Initialize ScreenUtils MediaQuery data
     if (!GetIt.I.isRegistered<ScreenUtils>()) {

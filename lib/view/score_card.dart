@@ -13,16 +13,20 @@ class ScoreCard extends StatefulWidget {
 }
 
 class _ScoreCardState extends State<ScoreCard> {
+  List<int> rolls = [];
+  int totalScore = 0;
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<BowlingCubit, BowlingState>(builder: (context, state) {
-      List<int> rolls = [];
-      int totalScore = 0;
       if (state is CalculatingScoreState) {
         // Show loading
       } else if (state is ScoreCalculatedState) {
         totalScore = state.totalScore;
+        rolls.clear();
         rolls.addAll(BlocProvider.of<BowlingCubit>(context).rollsForUI);
+      } else if (state is SuccessResetScoreState) {
+        rolls.clear();
+        totalScore = 0;
       }
       print("ROLLS: ${rolls}");
       return Column(

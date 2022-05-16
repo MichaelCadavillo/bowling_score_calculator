@@ -33,3 +33,15 @@ class ErrorCalculatingScoreState extends BowlingState {
 class ResettingScoreState extends BowlingState {}
 
 class SuccessResetScoreState extends BowlingState {}
+
+// Applicable roll value states
+class UpdatingApplicableRollsState extends BowlingState {}
+
+class UpdatedApplicableRollsState extends BowlingState {
+  final List<int> rollValues;
+
+  const UpdatedApplicableRollsState({required this.rollValues});
+
+  @override
+  List<Object?> get props => [rollValues];
+}

@@ -12,88 +12,57 @@ class ScoreButtonsView extends StatefulWidget {
 }
 
 class _ScoreButtonsViewState extends State<ScoreButtonsView> {
+  List<int> rollButtons = [];
+
+  @override
+  void initState() {
+    BlocProvider.of<BowlingCubit>(context).fetchApplicableButtons();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Wrap(
-          runSpacing: 5,
-          children: [
-            ScoreButton(
-              label: '1',
-              onTap: () {
-                BlocProvider.of<BowlingCubit>(context).rollBall(1);
-              },
-            ),
-            ScoreButton(
-              label: '2',
-              onTap: () {
-                BlocProvider.of<BowlingCubit>(context).rollBall(2);
-              },
-            ),
-            ScoreButton(
-              label: '3',
-              onTap: () {
-                BlocProvider.of<BowlingCubit>(context).rollBall(3);
-              },
-            ),
-            ScoreButton(
-              label: '4',
-              onTap: () {
-                BlocProvider.of<BowlingCubit>(context).rollBall(4);
-              },
-            ),
-            ScoreButton(
-              label: '5',
-              onTap: () {
-                BlocProvider.of<BowlingCubit>(context).rollBall(5);
-              },
-            ),
-            ScoreButton(
-              label: '6',
-              onTap: () {
-                BlocProvider.of<BowlingCubit>(context).rollBall(6);
-              },
-            ),
-            ScoreButton(
-              label: '7',
-              onTap: () {
-                BlocProvider.of<BowlingCubit>(context).rollBall(7);
-              },
-            ),
-            ScoreButton(
-              label: '8',
-              onTap: () {
-                BlocProvider.of<BowlingCubit>(context).rollBall(8);
-              },
-            ),
-            ScoreButton(
-              label: '9',
-              onTap: () {
-                BlocProvider.of<BowlingCubit>(context).rollBall(9);
-              },
-            ),
-            ScoreButton(
-              label: 'X',
-              onTap: () {
-                BlocProvider.of<BowlingCubit>(context).rollBall(10);
-              },
-            )
-          ],
-        ),
-        SizedBox(height: hp(10)),
-        ElevatedButton(
-          onPressed: () => BlocProvider.of<BowlingCubit>(context).resetGame(),
-          child: Text("Reset Game"),
-          style: ButtonStyle(
-            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18.0),
+    return BlocBuilder<BowlingCubit, BowlingState>(builder: (context, state) {
+      if (state is UpdatingApplicableRollsState) {
+        // Show loading
+      } else if (state is UpdatedApplicableRollsState) {
+        rollButtons.clear();
+        rollButtons.addAll(state.rollValues);
+      } else if (state is ScoreCalculatedState) {
+        BlocProvider.of<BowlingCubit>(context).fetchApplicableButtons();
+      } else if (state is SuccessResetScoreState) {
+        BlocProvider.of<BowlingCubit>(context).fetchApplicableButtons();
+      }
+      return Column(
+        children: [
+          Wrap(
+              runSpacing: 5,
+              children: List<Widget>.generate(
+                rollButtons.length,
+                (index) => ScoreButton(
+                  label: rollButtons[index] == 10
+                      ? 'X'
+                      : rollButtons[index].toString(),
+                  onTap: () {
+                    BlocProvider.of<BowlingCubit>(context)
+                        .rollBall(rollButtons[index]);
+                  },
+                ),
+              )),
+          SizedBox(height: hp(10)),
+          ElevatedButton(
+            onPressed: () => BlocProvider.of<BowlingCubit>(context).resetGame(),
+            child: const Text("Reset Game"),
+            style: ButtonStyle(
+              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18.0),
+                ),
               ),
             ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
+    });
   }
 }
