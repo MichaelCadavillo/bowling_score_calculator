@@ -1,5 +1,4 @@
 import 'package:bowling_score_calculator/bloc/bowling_cubit.dart';
-import 'package:collection/collection.dart';
 import 'package:bowling_score_calculator/utility/list_util.dart';
 import 'package:bowling_score_calculator/utility/screen_utils_helper.dart';
 import 'package:bowling_score_calculator/view/widgets/frame_view.dart';

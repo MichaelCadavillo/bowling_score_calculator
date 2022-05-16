@@ -1,3 +1,4 @@
+import 'package:bowling_score_calculator/data/exceptions/game_already_finished_exception.dart';
 import 'package:bowling_score_calculator/data/exceptions/invalid_roll_exception.dart';
 
 class BowlingUtils {
@@ -17,13 +18,14 @@ class BowlingUtils {
     return rolls[rollIndex] == 10;
   }
 
-  static bool isGameValid(List<int> rolls, int rollScore) {
-    // // Check if frame is valid
-    // if (rolls.length > 21) {
-    //   throw FrameOutOfRangeException(
-    //       displayMessage:
-    //           "The game has already been finished! Please start a new game.");
-    // }
+  static bool isGameValid(List<int> rolls, int rollScore,
+      List<int> scoresPerFrame, List<int> applicableRolls) {
+    // Check if game is still ongoing/valid
+    if (scoresPerFrame.length == 10) {
+      throw GameAlreadyFinishedException(
+          displayMessage:
+              "The game has already been finished! Please start a new game.");
+    }
 
     // Check if score from roll is valid.
     if (rollScore < 0) {
@@ -32,6 +34,8 @@ class BowlingUtils {
     } else if (rollScore > 10) {
       throw InvalidRollException(
           displayMessage: "Score can't be more than 10 per Roll!");
+    } else if (!applicableRolls.contains(rollScore)) {
+      throw InvalidRollException(displayMessage: "Roll is invalid!");
     }
 
     return true;

@@ -23,6 +23,7 @@ class _ScoreButtonsViewState extends State<ScoreButtonsView> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<BowlingCubit, BowlingState>(builder: (context, state) {
+      bool isButtonEnabled = true;
       if (state is UpdatingApplicableRollsState) {
         // Show loading
       } else if (state is UpdatedApplicableRollsState) {
@@ -32,6 +33,10 @@ class _ScoreButtonsViewState extends State<ScoreButtonsView> {
         BlocProvider.of<BowlingCubit>(context).fetchApplicableButtons();
       } else if (state is SuccessResetScoreState) {
         BlocProvider.of<BowlingCubit>(context).fetchApplicableButtons();
+      } else if(state is ErrorCalculatingScoreState){
+        if(state.errorMessage.contains("GameAlreadyFinishedException")){
+          isButtonEnabled = false;
+        }
       }
       return Column(
         children: [
@@ -43,6 +48,7 @@ class _ScoreButtonsViewState extends State<ScoreButtonsView> {
                   label: rollButtons[index] == 10
                       ? 'X'
                       : rollButtons[index].toString(),
+                      enabled: isButtonEnabled,
                   onTap: () {
                     BlocProvider.of<BowlingCubit>(context)
                         .rollBall(rollButtons[index]);

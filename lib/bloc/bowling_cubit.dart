@@ -1,4 +1,4 @@
-import 'package:bowling_score_calculator/data/exceptions/frame_out_of_range_exception.dart';
+import 'package:bowling_score_calculator/data/exceptions/game_already_finished_exception.dart';
 import 'package:bowling_score_calculator/data/exceptions/invalid_roll_exception.dart';
 import 'package:bowling_score_calculator/utility/bowling_utils.dart';
 import 'package:bowling_score_calculator/utility/list_util.dart';
@@ -14,12 +14,13 @@ class BowlingCubit extends Cubit<BowlingState> {
   final List<int> rolls = [];
   final List<int> rollsForUI = [];
   final List<int> scorePerFrame = [];
+  final List<int> _applicableRollValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
   Future<void> rollBall(int rollScore) async {
     emit(CalculatingScoreState());
     try {
       // Check if the game is valid before trying to calculate. Throws an exception if game is invalid.
-      if (BowlingUtils.isGameValid(rolls, rollScore)) {
+      if (BowlingUtils.isGameValid(rolls, rollScore, scorePerFrame, _applicableRollValues)) {
         rolls.add(rollScore);
 
         // Update roll scores for UI
@@ -35,8 +36,8 @@ class BowlingCubit extends Cubit<BowlingState> {
     } on InvalidRollException catch (e, stk) {
       debugPrint("InvalidRollException: $e, $stk");
       emit(ErrorCalculatingScoreState(errorMessage: e.toString()));
-    } on FrameOutOfRangeException catch (e, stk) {
-      debugPrint("FrameOutOfRangeException: $e, $stk");
+    } on GameAlreadyFinishedException catch (e, stk) {
+      debugPrint("GameAlreadyFinishedException: $e, $stk");
       emit(ErrorCalculatingScoreState(errorMessage: e.toString()));
     } catch (e, stk) {
       debugPrint("Error: $e, $stk");
@@ -49,22 +50,24 @@ class BowlingCubit extends Cubit<BowlingState> {
     emit(ResettingScoreState());
     rolls.clear();
     rollsForUI.clear();
+    scorePerFrame.clear();
     emit(SuccessResetScoreState());
   }
 
   /// Used fetching the applicable roll buttons for the current frame
   Future<void> fetchApplicableButtons() async {
     emit(UpdatingApplicableRollsState());
-    List<int> applicableRollValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    _applicableRollValues.clear();
+    _applicableRollValues.addAll([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     if (ListUtil.isNotEmpty(rollsForUI) &&
         rollsForUI.lastIndexWhere((element) => rollsForUI.length % 2 == 1) !=
             -1) {
       int highestPossibleRoll = 10 - rollsForUI.last;
-      applicableRollValues.removeRange(
-          highestPossibleRoll + 1, applicableRollValues.length);
+      _applicableRollValues.removeRange(
+          highestPossibleRoll + 1, _applicableRollValues.length);
     }
 
-    emit(UpdatedApplicableRollsState(rollValues: applicableRollValues));
+    emit(UpdatedApplicableRollsState(rollValues: _applicableRollValues));
   }
 
   /// Main logic for calculating the score of the game
