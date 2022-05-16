@@ -18,9 +18,9 @@ class MyApp extends StatelessWidget {
       ),
       home: Scaffold(
           appBar: AppBar(
-            title: Text("Bowling Score Calculator"),
+            title: const Text("Bowling Score Calculator"),
           ),
-          body: const HomeScreen()),
+          body: const Center(child: HomeScreen())),
     );
   }
 }

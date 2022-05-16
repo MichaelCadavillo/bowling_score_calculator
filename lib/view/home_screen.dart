@@ -35,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return BlocProvider<BowlingCubit>(
       create: (BuildContext context) => BowlingCubit(),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const ScoreCard(),
           Container(
