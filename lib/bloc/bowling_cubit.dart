@@ -11,6 +11,7 @@ class BowlingCubit extends Cubit<BowlingState> {
   BowlingCubit() : super(InitialBowlingState());
 
   final List<int> rolls = [];
+  final List<int> rollsForUI = [];
 
   Future<void> rollBall(int rollScore) async {
     emit(CalculatingScoreState());
@@ -18,7 +19,8 @@ class BowlingCubit extends Cubit<BowlingState> {
       // Check if the game is valid before trying to calculate. Throws an exception if game is invalid.
       if (BowlingUtils.isGameValid(rolls, rollScore)) {
         rolls.add(rollScore);
-        // emit(UpdatedRollsState(rolls: rolls));
+        rollsForUI.clear();
+        rollsForUI.addAll(_getRollsForUI(rolls));
 
         int totalScore = _calculateScore();
 
@@ -38,12 +40,15 @@ class BowlingCubit extends Cubit<BowlingState> {
     }
   }
 
+  /// Used to reset the game
   Future<void> resetGame() async {
     emit(ResettingScoreState());
     rolls.clear();
+    rollsForUI.clear();
     emit(SuccessResetScoreState());
   }
 
+  /// Main logic for calculating the score of the game
   int _calculateScore() {
     int score = 0;
     int rollIndex = 0;
@@ -71,5 +76,24 @@ class BowlingCubit extends Cubit<BowlingState> {
     }
 
     return score;
+  }
+
+  /// Returns the List of rolls with blank spaces (-1) before Strike rolls in preparation for showing to the UI
+  List<int> _getRollsForUI(List<int> rolls) {
+    List<int> updatedRolls = [...rolls];
+    int numOfStrikes = rolls.where((rolls) => rolls == 10).length;
+    int prevIndex = 0;
+
+    // Add -1 identifier if the roll was a strike.
+    for (int i = 0; i < numOfStrikes; i++) {
+      if (updatedRolls.indexOf(10, prevIndex) == 0 ||
+          updatedRolls.indexOf(10, prevIndex) - 1 >= 0 &&
+              updatedRolls[updatedRolls.indexOf(10, prevIndex) - 1] != -1) {
+        updatedRolls.insert(updatedRolls.indexOf(10, prevIndex), -1);
+      }
+      prevIndex = updatedRolls.indexOf(10, prevIndex) + 1;
+    }
+
+    return updatedRolls;
   }
 }

@@ -33,9 +33,8 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           const ScoreCard(),
           Container(
-              padding: const EdgeInsets.symmetric(horizontal: 100),
+              padding: EdgeInsets.symmetric(horizontal: wp(10)),
               child: const ScoreButtonsView()),
-          SizedBox(height: hp(15))
         ],
       ),
     );

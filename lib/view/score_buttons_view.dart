@@ -1,4 +1,5 @@
 import 'package:bowling_score_calculator/bloc/bowling_cubit.dart';
+import 'package:bowling_score_calculator/utility/screen_utils_helper.dart';
 import 'package:bowling_score_calculator/view/widgets/score_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -80,7 +81,7 @@ class _ScoreButtonsViewState extends State<ScoreButtonsView> {
             )
           ],
         ),
-        const SizedBox(height: 200),
+        SizedBox(height: hp(10)),
         ElevatedButton(
           onPressed: () => BlocProvider.of<BowlingCubit>(context).resetGame(),
           child: Text("Reset Game"),

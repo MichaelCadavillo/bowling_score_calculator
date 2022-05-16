@@ -28,3 +28,8 @@ class ErrorCalculatingScoreState extends BowlingState {
   @override
   List<Object?> get props => [errorMessage];
 }
+
+// Reset game states
+class ResettingScoreState extends BowlingState {}
+
+class SuccessResetScoreState extends BowlingState {}

@@ -22,14 +22,14 @@ class _ScoreCardState extends State<ScoreCard> {
         // Show loading
       } else if (state is ScoreCalculatedState) {
         totalScore = state.totalScore;
-        rolls.addAll(BlocProvider.of<BowlingCubit>(context).rolls);
+        rolls.addAll(BlocProvider.of<BowlingCubit>(context).rollsForUI);
       }
       print("ROLLS: ${rolls}");
       return Column(
         children: [
           SizedBox(
             width: wp(100),
-            height: hp(10),
+            height: 100,
             child: ListView.builder(
                 itemCount: 19,
                 shrinkWrap: true,
@@ -37,6 +37,14 @@ class _ScoreCardState extends State<ScoreCard> {
                 itemBuilder: (context, index) {
                   // Check if last index
                   if (index == 18) {
+                    if (rolls.length > index) {
+                      // Remove the placeholder (-1) for the last frame.
+                      List<int> lastFrame = rolls.sublist(index);
+                      rolls.removeRange(index, rolls.length);
+                      lastFrame.removeWhere((roll) => roll == -1);
+                      rolls.addAll(lastFrame);
+                    }
+
                     return FrameView(
                       rollScore1: (rolls.length > index) ? rolls[index] : null,
                       rollScore2:
@@ -44,22 +52,12 @@ class _ScoreCardState extends State<ScoreCard> {
                       rollScore3:
                           (rolls.length > index + 2) ? rolls[index + 2] : null,
                       isLastFrame: true,
-                      totalScore: 10,
+                      totalScore: totalScore,
                     );
                   }
 
                   // Split rolls by frame
                   if (index % 2 == 0) {
-                    // If roll was a strike, skip 
-                    if (BowlingUtils.isStrike(rolls, index)) {
-                      return FrameView(
-                        rollScore1: null,
-                        rollScore2:
-                            (rolls.length > index) ? rolls[index] : null,
-                        totalScore: 10,
-                      );
-                    }
-
                     return FrameView(
                       rollScore1: (rolls.length > index) ? rolls[index] : null,
                       rollScore2:
@@ -71,11 +69,12 @@ class _ScoreCardState extends State<ScoreCard> {
                   return Container();
                 }),
           ),
-          Text("Total Score:",
+          SizedBox(height: hp(5)),
+          const Text("Total Score:",
               style: TextStyle(fontSize: 17, fontWeight: FontWeight.w400)),
           Text(
             "$totalScore",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
           ),
           SizedBox(
             height: hp(10),
