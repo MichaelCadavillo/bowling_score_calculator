@@ -1,5 +1,6 @@
 import 'package:bowling_score_calculator/bloc/bowling_cubit.dart';
 import 'package:bowling_score_calculator/utility/bowling_utils.dart';
+import 'package:bowling_score_calculator/utility/list_util.dart';
 import 'package:bowling_score_calculator/utility/screen_utils_helper.dart';
 import 'package:bowling_score_calculator/view/widgets/frame_view.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +29,6 @@ class _ScoreCardState extends State<ScoreCard> {
         rolls.clear();
         totalScore = 0;
       }
-      print("ROLLS: ${rolls}");
       return Column(
         children: [
           SizedBox(
@@ -39,7 +39,18 @@ class _ScoreCardState extends State<ScoreCard> {
                 shrinkWrap: true,
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (context, index) {
-                  // Check if last index
+                  int totalScoreForFrame = 0;
+                  if (ListUtil.isNotEmpty(BlocProvider.of<BowlingCubit>(context)
+                          .scorePerFrame) &&
+                      BlocProvider.of<BowlingCubit>(context)
+                              .scorePerFrame
+                              .length >
+                          index ~/ 2) {
+                    totalScoreForFrame = BlocProvider.of<BowlingCubit>(context)
+                        .scorePerFrame[index ~/ 2];
+                  }
+
+                  // Check if last frame
                   if (index == 18) {
                     if (rolls.length > index) {
                       // Remove the placeholder (-1) for the last frame.
@@ -66,7 +77,7 @@ class _ScoreCardState extends State<ScoreCard> {
                       rollScore1: (rolls.length > index) ? rolls[index] : null,
                       rollScore2:
                           (rolls.length > index + 1) ? rolls[index + 1] : null,
-                      totalScore: 10,
+                      totalScore: totalScoreForFrame,
                     );
                   }
 

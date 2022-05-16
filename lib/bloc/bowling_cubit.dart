@@ -13,6 +13,7 @@ class BowlingCubit extends Cubit<BowlingState> {
 
   final List<int> rolls = [];
   final List<int> rollsForUI = [];
+  final List<int> scorePerFrame = [];
 
   Future<void> rollBall(int rollScore) async {
     emit(CalculatingScoreState());
@@ -59,44 +60,48 @@ class BowlingCubit extends Cubit<BowlingState> {
         rollsForUI.lastIndexWhere((element) => rollsForUI.length % 2 == 1) !=
             -1) {
       int highestPossibleRoll = 10 - rollsForUI.last;
-      print("highestPossibleRoll: $highestPossibleRoll");
       applicableRollValues.removeRange(
           highestPossibleRoll + 1, applicableRollValues.length);
     }
-
-    print("Applicable Roll Values: $applicableRollValues");
 
     emit(UpdatedApplicableRollsState(rollValues: applicableRollValues));
   }
 
   /// Main logic for calculating the score of the game
   int _calculateScore() {
-    int score = 0;
+    scorePerFrame.clear();
+    int totalScore = 0;
     int rollIndex = 0;
 
     for (int frame = 0; frame < 10; frame++) {
       if (BowlingUtils.isStrike(rolls, rollIndex)) {
         // Checks if the next two rolls already exists to calculate score.
         if (rolls.length > rollIndex + 1 && rolls.length > rollIndex + 2) {
-          score +=
+          int score =
               rolls[rollIndex] + rolls[rollIndex + 1] + rolls[rollIndex + 2];
+          scorePerFrame.add(score);
+          totalScore += score;
           rollIndex++;
         }
       } else if (BowlingUtils.isSpare(rolls, rollIndex)) {
         if (rolls.length > rollIndex + 1 && rolls.length > rollIndex + 2) {
-          score +=
+          int score =
               rolls[rollIndex] + rolls[rollIndex + 1] + rolls[rollIndex + 2];
+          scorePerFrame.add(score);
+          totalScore += score;
           rollIndex += 2;
         }
       } else {
         if (rolls.length > rollIndex + 1) {
-          score += rolls[rollIndex] + rolls[rollIndex + 1];
+          int score = rolls[rollIndex] + rolls[rollIndex + 1];
+          scorePerFrame.add(score);
+          totalScore += score;
           rollIndex += 2;
         }
       }
     }
 
-    return score;
+    return totalScore;
   }
 
   /// Returns the List of rolls with blank spaces (-1) before Strike rolls in preparation for showing to the UI
