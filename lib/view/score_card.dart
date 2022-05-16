@@ -1,5 +1,5 @@
 import 'package:bowling_score_calculator/bloc/bowling_cubit.dart';
-import 'package:bowling_score_calculator/utility/bowling_utils.dart';
+import 'package:collection/collection.dart';
 import 'package:bowling_score_calculator/utility/list_util.dart';
 import 'package:bowling_score_calculator/utility/screen_utils_helper.dart';
 import 'package:bowling_score_calculator/view/widgets/frame_view.dart';
@@ -14,11 +14,12 @@ class ScoreCard extends StatefulWidget {
 }
 
 class _ScoreCardState extends State<ScoreCard> {
-  List<int> rolls = [];
+  final List<int> rolls = [];
   int totalScore = 0;
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<BowlingCubit, BowlingState>(builder: (context, state) {
+      List<int> scoresPerFrame = [];
       if (state is CalculatingScoreState) {
         // Show loading
       } else if (state is ScoreCalculatedState) {
@@ -48,6 +49,13 @@ class _ScoreCardState extends State<ScoreCard> {
                           index ~/ 2) {
                     totalScoreForFrame = BlocProvider.of<BowlingCubit>(context)
                         .scorePerFrame[index ~/ 2];
+                    if (ListUtil.isNotEmpty(scoresPerFrame)) {
+                      scoresPerFrame
+                          .add(scoresPerFrame.last + totalScoreForFrame);
+                    } else {
+                      scoresPerFrame.add(totalScoreForFrame);
+                    }
+                    totalScoreForFrame = scoresPerFrame[index ~/ 2];
                   }
 
                   // Check if last frame
