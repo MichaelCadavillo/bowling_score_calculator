@@ -1,6 +1,6 @@
 # bowling_score_calculator
 
-A Simple Bowling Game Score Calculator using Test-Driven Development demo.
+A Simple Bowling Game Score Calculator Demo written in Dart (Flutter) using Test-Driven Development.
 <br />
 Based from Kata Bowling Exercise: https://codingdojo.org/kata/Bowling/
 
